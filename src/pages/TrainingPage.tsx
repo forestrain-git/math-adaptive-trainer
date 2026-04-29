@@ -52,14 +52,26 @@ export default function TrainingPage() {
 
   // Timing
   const [questionStartTime, setQuestionStartTime] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const sessionStartTime = useRef(Date.now());
 
   // Generate initial block on mount
   useEffect(() => {
     const initialQuestions = generateInitialTrainingBlock();
     setQuestions(initialQuestions);
     setQuestionStartTime(Date.now());
+    sessionStartTime.current = Date.now();
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
+
+  // Session timer
+  useEffect(() => {
+    if (isFinished) return;
+    const interval = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - sessionStartTime.current) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isFinished]);
 
   const currentQuestion = questions[currentIndex];
   const overallIndex = (currentBlock - 1) * QUESTIONS_PER_BLOCK + currentIndex + 1;
@@ -196,6 +208,12 @@ export default function TrainingPage() {
     setIsSubmitting(false);
   }, [records, currentBlock]);
 
+  const formatTime = (seconds: number): string => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     // Only allow digits, max 3 chars
@@ -219,6 +237,7 @@ export default function TrainingPage() {
       {/* Progress */}
       <div className="progress-text">
         第 {currentBlock} 组 / {TOTAL_BLOCKS} 组 · 第 {overallIndex} 题 / {TOTAL_QUESTIONS} 题
+        <span style={{ float: 'right', color: '#78909c' }}>用时 {formatTime(elapsedSeconds)}</span>
       </div>
       <div className="progress-bar">
         <div

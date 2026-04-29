@@ -325,36 +325,21 @@ function generateS3(): MathQuestion {
 }
 
 function generateS4(): MathQuestion {
-  // 两位数减两位数退位
-  let operand1 = randomInt(20, 99);
-  let operand2 = randomInt(10, 89);
+  // 两位数减两位数退位：至少有一位需要退位，结果为正
+  let operand1: number;
+  let operand2: number;
+  let attempts = 0;
+  const maxAttempts = 50;
 
-  if (operand2 >= operand1) {
+  do {
+    operand1 = randomInt(20, 99);
     operand2 = randomInt(10, operand1 - 1);
-  }
-
-  const ones1 = operand1 % 10;
-  const ones2 = operand2 % 10;
-  const tens1 = Math.floor(operand1 / 10);
-  const tens2 = Math.floor(operand2 / 10);
-
-  const needsOnesBorrow = ones1 < ones2;
-  const needsTensBorrow = tens1 < tens2;
-
-  if (!needsOnesBorrow && !needsTensBorrow) {
-    // 强制产生退位：调整个位使个位不够减
-    const newOnes2 = randomInt(ones1 + 1, 9);
-    operand2 = tens2 * 10 + newOnes2;
-  }
-
-  // 确保结果为正
-  if (operand2 >= operand1) {
-    operand2 = randomInt(10, operand1 - 1);
-    // 确保至少有一位需要退位
-    if ((operand1 % 10) >= (operand2 % 10) && Math.floor(operand1 / 10) >= Math.floor(operand2 / 10)) {
-      operand2 = (Math.floor(operand2 / 10)) * 10 + randomInt((operand1 % 10) + 1, 9);
-    }
-  }
+    attempts++;
+  } while (
+    attempts < maxAttempts &&
+    (operand1 % 10) >= (operand2 % 10) &&
+    Math.floor(operand1 / 10) >= Math.floor(operand2 / 10)
+  );
 
   return {
     id: generateId(),
