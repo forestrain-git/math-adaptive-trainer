@@ -413,8 +413,8 @@ export function generateQuestionsBySkillTag(skillTag: SkillTagId, count: number)
 
 export function generateInitialTrainingBlock(): MathQuestion[] {
   const distribution: Record<SkillTagId, number> = {
-    A1: 3,
-    A2: 3,
+    A1: 4,
+    A2: 4,
     A3: 2,
     A4: 2,
     A5: 2,
